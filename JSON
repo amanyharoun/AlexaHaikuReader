@@ -1,0 +1,137 @@
+/* eslint-disable  func-names */
+/* eslint-disable  no-console */
+
+const Alexa = require('ask-sdk-core');
+
+const GetNewFactHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return request.type === 'LaunchRequest'
+      || (request.type === 'IntentRequest');
+  },
+  handle(handlerInput) {
+    const factArr = data;
+    const factIndex = Math.floor(Math.random() * factArr.length);
+    const randomFact = factArr[factIndex];
+    const speechOutput = GET_FACT_MESSAGE + randomFact;
+
+    return handlerInput.responseBuilder
+      .speak(speechOutput)
+      .withSimpleCard(SKILL_NAME, randomFact)
+      .getResponse();
+  },
+};
+
+const HelpHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return request.type === 'IntentRequest'
+      && request.intent.name === 'AMAZON.HelpIntent';
+  },
+  handle(handlerInput) {
+    return handlerInput.responseBuilder
+      .speak(HELP_MESSAGE)
+      .reprompt(HELP_REPROMPT)
+      .getResponse();
+  },
+};
+
+const ExitHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return request.type === 'IntentRequest'
+      && (request.intent.name === 'AMAZON.CancelIntent'
+        || request.intent.name === 'AMAZON.StopIntent');
+  },
+  handle(handlerInput) {
+    return handlerInput.responseBuilder
+      .speak(STOP_MESSAGE)
+      .getResponse();
+  },
+};
+
+const SessionEndedRequestHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return request.type === 'SessionEndedRequest';
+  },
+  handle(handlerInput) {
+    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
+
+    return handlerInput.responseBuilder.getResponse();
+  },
+};
+
+const ErrorHandler = {
+  canHandle() {
+    return true;
+  },
+  handle(handlerInput, error) {
+    console.log(`Error handled: ${error.message}`);
+
+    return handlerInput.responseBuilder
+      .speak('Sorry, an error occurred.')
+      .reprompt('Sorry, an error occurred.')
+      .getResponse();
+  },
+};
+
+const SKILL_NAME = 'Haiku Reader';
+const GET_FACT_MESSAGE = 'I have a haiku for you: ';
+const HELP_MESSAGE = 'You can say tell me a haiku...  or, you can say stop... What can I help you with?';
+const HELP_REPROMPT = 'You can ask me to tell a haiku or exit to stop. What can I help you with?';
+const STOP_MESSAGE = 'Goodbye!';
+
+const data = [
+  `The sun is bright.
+   Faraway is the
+   night.`,
+
+  `The road is straight.
+   But so many take
+   the hard way.`,
+  
+  `I look at the mirror
+   and remember
+   all those tears.`,
+
+  `VUI arrived with
+   prompts to
+   save the day.`,
+  
+  `Life is a real game.
+   Everyone is a
+   Performer.`,
+
+  `When your digital twin
+   goes to an AI party and
+   returns with an attitude.`,
+  
+  `Words become meaningless,
+   when they don’t contain
+   emotions.`,
+
+  `I’ll pursue that dream
+   until
+   it becomes true.`,
+  
+  `Faith in your ability to
+   achieve
+   is more important than facts`,
+
+  `Envision success
+   even if you don’t see light
+   at the end of the tunnel.`
+];
+
+const skillBuilder = Alexa.SkillBuilders.custom();
+
+exports.handler = skillBuilder
+  .addRequestHandlers(
+    GetNewFactHandler,
+    HelpHandler,
+    ExitHandler,
+    SessionEndedRequestHandler
+  )
+  .addErrorHandlers(ErrorHandler)
+  .lambda();
